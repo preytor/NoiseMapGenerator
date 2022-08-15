@@ -22,11 +22,11 @@ Once it's done click generate with the settings you want and enjoy.
 
 # Images
 
-Preview of the map
+## Preview of the map
 ![Map preview](./images/map_viewer.png)
 
-Generating a map with the settings we want
+## Generating a map with the settings we want
 ![Map Generation](./images/changingsettings.gif)
 
-Moving and zooming around the map
+## Moving and zooming around the map
 ![Map Zoom](./images/move_and_zoom.gif)
