@@ -3,6 +3,8 @@ A python map generator using perlin noise.
 
 Warning ahead, the code is not really clean and it runs slow with big maps, a 100x100 map usually runs pretty well.
 
+The test_heights.py is a script to check the maximum and minimum height of the noise
+
 # Installation, configuration and execution
 
 First install [Python](https://www.python.org/) (I developed it with 3.9 but it should work in higher versions) do a `pip install -r requirements.txt` and it will do the rest
