@@ -170,5 +170,5 @@ class Game:
             for box in self.input_boxes:
                 box.handle_event(event)
 
-            for tile in self.map.tiles:
+            for tile in self.map.tiles_sprites:
                 tile.check_collisions(event)

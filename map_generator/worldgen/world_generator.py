@@ -14,8 +14,9 @@ class WorldGenerator:
         self.x = x
         self.y = y
         self.isTiles = isTiles
-        self.tiles = []
-        print(self.tiles)
+        self.tiles_data = []
+        self.tiles_sprites = []
+        print(self.tiles_data)
 
 
     def apply_parameters(self, scale, octaves, persistence, lacunarity, offset_x, offset_y):
@@ -28,20 +29,12 @@ class WorldGenerator:
 
         
     def generate_world(self) -> None:
-        shape = np.zeros((self.x, self.y), dtype=float)
-        # We delete all of these values and restart them to avoid memory leaks
-        if self.isTiles:
-            self.game.tiles.empty()
-        else:
-            self.game.image_tiles.empty()
-        del self.tiles  
-        self.tiles = []
-        if not self.isTiles:
-            img = Image.new('RGB', (self.x*TILESIZE, self.y*TILESIZE))
-            map_image = ImageDraw.Draw(img)
+        del self.tiles_data  
+        #self.tiles_data = [[[] for _ in range(self.x)] for _ in range(self.y)]
+        self.tiles_data = np.empty((self.x, self.y))
 
-        for i in range(len(shape[0])):
-            for j in range(len(shape[1])):
+        for i, i_value in enumerate(self.tiles_data):
+            for j, j_value in enumerate(self.tiles_data[i]):
                 p = pnoise2(
                     (i/self.scale)+self.offset_x,
                     (j/self.scale)+self.offset_y,
@@ -53,10 +46,29 @@ class WorldGenerator:
                     base=MAP_SEED
                 )
 
-                height = self.terrain_from_height(p)
+                self.tiles_data[i][j] = p
+
+        self.display_world()
+
+    def display_world(self):
+        # We delete all of these values and restart them to avoid memory leaks
+        if self.isTiles:
+            self.game.tiles.empty()
+        else:
+            self.game.image_tiles.empty()
+        del self.tiles_sprites
+        self.tiles_sprites = []
+
+        if not self.isTiles:
+            img = Image.new('RGB', (self.x*TILESIZE, self.y*TILESIZE))
+            map_image = ImageDraw.Draw(img)
+        
+        for i, i_value in enumerate(self.tiles_data):
+            for j, j_value in enumerate(self.tiles_data[i]):
+                height = self.terrain_from_height(j_value)
                 if self.isTiles:
                     tile = Tile(self.game, i, j, height)
-                    self.tiles.append(tile)
+                    self.tiles_sprites.append(tile)
                 else:
                     map_image.rectangle([(i*TILESIZE,j*TILESIZE),((i*TILESIZE)+TILESIZE-1,(j*TILESIZE)+TILESIZE-1)], fill=get_tile_sprite(height))
 
@@ -65,7 +77,7 @@ class WorldGenerator:
                 (self.x*TILESIZE)/(self.game.map.scale/10)-1, 
                 (self.y*TILESIZE)/(self.game.map.scale/10)-1
                 )], outline="red", width=1)
-            self.tiles.append(ImageTile(self.game, MAP_WIDTH+10, 0, self.x, self.y, img))
+            self.tiles_sprites.append(ImageTile(self.game, MAP_WIDTH+10, 0, self.x, self.y, img))
 
     def update_map_image_with_rect(self):
         shape = np.zeros((self.x, self.y), dtype=float)
@@ -92,7 +104,7 @@ class WorldGenerator:
                 (self.x*TILESIZE)/(self.game.map.scale/10)-1, 
                 (self.y*TILESIZE)/(self.game.map.scale/10)-1
                 )], outline="red", width=1)
-        self.tiles.append(ImageTile(self.game, 110, 0, self.x, self.y, img))
+        self.tiles_sprites.append(ImageTile(self.game, 110, 0, self.x, self.y, img))
 
 
     def draw(self):
